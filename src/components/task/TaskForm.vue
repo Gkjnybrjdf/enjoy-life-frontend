@@ -3,26 +3,37 @@
     <app-input
         v-focus
         label="Название"
-        v-model="task.name"
+        v-model="v$.task.name.$model"
+        :error="v$.task.name.$error"
     />
+    <div
+        class="error"
+        v-if="v$.task.name.required.$invalid && v$.task.name.$dirty"
+    >
+      Название обязательно для заполнения
+    </div>
 
     <dropdown
+        :default-content="defaultPriority"
         :options-content="priorityOptions"
         label="Приоритет"
-        v-model="task.priority"
+        v-model="v$.task.priority.$model"
+        :error="v$.task.priority.$error"
+        @blur="test"
     >
     </dropdown>
+    <div
+        class="error"
+        v-if="v$.task.priority.required.$invalid && v$.task.priority.$dirty"
+    >
+      Приоритет обязателен для заполнения
+    </div>
 
     <app-checkbox
         name="Задача легкая"
         v-model="task.easy"
     >
     </app-checkbox>
-
-    <!--    <app-input
-            label="Категории"
-            v-model="task.categories"
-        />-->
 
     <app-label>Описание:</app-label>
     <textarea
@@ -32,72 +43,75 @@
 
     <app-button
         class="btns"
-        @click="onCreate"
+        v-bind:disabled="v$.$invalid"
+        @click="$emit('create', task)"
     >
-      Создать
+      {{ btnName }}
     </app-button>
   </form>
 </template>
 
 <script>
-import MyButton from "@/components/UI/AppButton";
-import MyLabel from "@/components/UI/AppLabel";
-import MySelect from "@/components/UI/MySelect";
-import {ref} from "vue";
+import AppButton from "@/components/UI/AppButton";
+import AppLabel from "@/components/UI/AppLabel";
+import {computed, ref} from "vue";
 import Dropdown from "@/components/UI/Dropdown";
-import {createTask} from "@/hooks/useTaskApi";
 import AppCheckbox from "@/components/UI/AppCheckbox";
+import {required} from "@vuelidate/validators";
+import {useVuelidate} from '@vuelidate/core'
 
 export default {
-  components: {AppCheckbox, Dropdown, MySelect, MyLabel, MyButton},
+  components: {AppCheckbox, Dropdown, AppLabel, AppButton},
 
   props: {
-    show: {
-      type: Boolean
+    task: {
+      type: Object
     }
   },
 
-  setup(props, {emit}) {
-    const task = ref({
-      name: undefined,
-      description: undefined,
-      priority: undefined,
-      easy: false,
-      active: true,
-      categories: []
-    })
-    const priorityOptions = ref(
-        [
-          {value: "LOW", name: "Низкий"},
-          {value: "MEDIUM", name: "Средний"},
-          {value: "HIGH", name: "Высокий"}
-        ]
-    )
+  setup(props) {
+    const priorityOptions = ref([
+      {value: "LOW", name: "Низкий"},
+      {value: "MEDIUM", name: "Средний"},
+      {value: "HIGH", name: "Высокий"}
+    ])
+    const btnName = props.task.id === undefined ? "Создать" : "Сохранить"
+    const defaultPriority = props.task.priority === undefined
+        ? "Выберите значение"
+        : priorityOptions.value[priorityOptions
+            .value
+            .findIndex((el) => el.value === props.task.priority)]
+            .name
 
-    const onCreate = () => {
-      createTask('/api/tasks', task.value)
-      emit('update:show', false)
+    const rules = computed(() => ({
+      task: {
+        name: {
+          required
+        },
+        priority: {
+          required
+        }
+      }
+    }))
+
+    const v$ = useVuelidate(rules, {task: props.task})
+
+    const test = () => {
+      v$.value.task.priority.$touch()
     }
 
     return {
       priorityOptions,
-      task,
-      onCreate
+      defaultPriority,
+      btnName,
+      v$,
+      test
     }
   }
 }
 </script>
 
 <style scoped>
-.textarea {
-  width: 90%;
-  border-radius: 5px;
-  border: 1px solid darkgrey;
-  padding: 10px 15px;
-  margin-bottom: 15px;
-  display: block;
-}
-
 .btns {
   display: flex;
   margin-left: auto;

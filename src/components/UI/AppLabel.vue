@@ -12,7 +12,4 @@ export default {
 </script>
 
 <style scoped>
-.app-label {
-  font-size: 11px;
-}
 </style>

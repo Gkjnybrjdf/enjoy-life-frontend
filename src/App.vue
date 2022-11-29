@@ -32,4 +32,19 @@ export default {
 .app-label {
   font-size: 11px;
 }
+
+.textarea {
+  width: 90%;
+  border-radius: 5px;
+  border: 1px solid darkgrey;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.error {
+  color: red;
+  font-size: 10px;
+  margin-left: 5px;
+}
 </style>

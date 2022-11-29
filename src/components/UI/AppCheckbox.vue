@@ -1,7 +1,7 @@
 <template>
   <div class="checkbox">
     <input
-        class="dropdown_input"
+        class="checkbox_input"
         type="checkbox"
         :value="modelValue"
         @input="updateInput"
@@ -39,7 +39,6 @@ export default {
 </script>
 
 <style scoped>
-
 .checkbox {
   display: flex;
   margin-bottom: 10px;
@@ -47,7 +46,7 @@ export default {
 
 }
 
-.dropdown_input {
+.checkbox_input {
   size: 15px;
 }
 

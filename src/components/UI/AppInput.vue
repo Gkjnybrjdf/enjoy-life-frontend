@@ -4,6 +4,7 @@
 
     <input
         class="app-input"
+        :class="{'error-input' : error}"
         type="text"
         :value="modelValue"
         @input="updateInput"
@@ -18,6 +19,11 @@ export default {
     modelValue: [Number, String],
     label: {
       type: String
+    },
+    error: {
+      type:Boolean,
+      default: false,
+      required: false
     }
   },
 
@@ -39,8 +45,12 @@ export default {
   border-radius: 5px;
   border: 1px solid darkgrey;
   padding: 10px 15px;
-  margin-bottom: 10px;
+  margin: 0 0 5px 0;
   display: block;
   font-size: 12px;
+}
+
+.error-input {
+  border-color: red;
 }
 </style>

@@ -4,11 +4,13 @@
       {{label}}:
       <button
           class="dropdown_button"
+          :class="{'error-dropdown' : error}"
           type="button"
           ref="dropDownBtn"
           @click="toggleShow"
+          @blur="$emit('blur')"
       >
-        Выберите из списка
+        {{defaultContent}}
       </button>
     </label>
 
@@ -46,12 +48,21 @@ export default {
       type: Array,
       default: () => []
     },
+    defaultContent: {
+      type: String,
+      default: ''
+    },
     modelValue: {
       type: String,
       default: ''
     },
     label: {
       type: String
+    },
+    error: {
+      type: Boolean,
+      default: false,
+      required: false
     }
   },
 
@@ -107,20 +118,20 @@ export default {
   position: relative;
 }
 
+.error-dropdown {
+  border-color: red !important;
+}
+
 .dropdown_button {
   position: relative;
   display: block;
   width: 100%;
   text-align: left;
-
   background: white;
   border: 1px solid darkgrey;
   border-radius: 5px;
-  /*height: 40 px;*/
-
   padding: 10px 15px;
-  margin-bottom: 10px;
-
+  margin-bottom: 5px;
   font-size: 12px;
 }
 
@@ -150,7 +161,7 @@ export default {
 
   position: absolute;
   left: 0;
-  top: 37px;
+  top: 53px;
 
   margin: 0;
   padding: 0;
@@ -177,7 +188,6 @@ export default {
   border-bottom: 0;
   padding: 10px 15px;
   cursor: pointer;
-
   font-size: 13px;
 }
 
