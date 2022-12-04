@@ -5,6 +5,8 @@ import router from './router'
 import store from './store'
 import components from "@/components/UI";
 import directives from "@/directives";
+import ElementPlus from "element-plus";
+import 'element-plus/dist/index.css'
 
 const app = createApp(App)
 
@@ -20,4 +22,5 @@ app
     .use(store)
     .use(router)
     .use(BootstrapIconsPlugin)
+    .use(ElementPlus)
     .mount('#app')

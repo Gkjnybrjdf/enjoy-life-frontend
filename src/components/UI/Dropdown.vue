@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown">
     <label class="app-label">
-      {{label}}:
+      {{ label }}:
       <button
           class="dropdown_button"
           :class="{'error-dropdown' : error}"
@@ -10,7 +10,11 @@
           @click="toggleShow"
           @blur="$emit('blur')"
       >
-        {{defaultContent}}
+        <span
+            :class="{'dropdown__placeholder' : modelValue.length === 0}"
+        >
+          {{ placeholder }}
+        </span>
       </button>
     </label>
 
@@ -48,7 +52,7 @@ export default {
       type: Array,
       default: () => []
     },
-    defaultContent: {
+    placeholder: {
       type: String,
       default: ''
     },
@@ -69,7 +73,6 @@ export default {
   setup(props, {emit}) {
     const dropDownBtn = ref(null);
     const dropDownList = ref(null);
-
 
     const update = (event) => {
       emit("update:modelValue", event.target.value)
@@ -149,11 +152,15 @@ export default {
 
   width: 0;
   height: 0;
-  border-width: 8px 6px 0 6px;
+  border-width: 6px 6px 0 6px;
   border-color: #80808073 transparent transparent transparent;
   border-style: solid;
 
   pointer-events: none;
+}
+
+.dropdown__placeholder {
+  color: #A8ABB2;
 }
 
 .dropdown_list {
@@ -188,7 +195,7 @@ export default {
   border-bottom: 0;
   padding: 10px 15px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .dropdown_list-item:first-child {

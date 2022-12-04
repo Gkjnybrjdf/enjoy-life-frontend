@@ -14,7 +14,6 @@
       <div>
         <div class="task-item-name">
           {{ task.name }}
-          {{ task.id }}
         </div>
       </div>
 

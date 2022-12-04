@@ -83,10 +83,10 @@ export default {
     const parentTask = ref()
     const tasks = ref([])
     const task = ref({})
-    clearTask()
     const headerName = ref("")
 
     const showDialog = () => {
+      clearTask()
       headerName.value = "Создание задачи"
       dialogTaskVisible.value = true
     }
@@ -128,15 +128,17 @@ export default {
       } else {
         const newTask = getTaskWithoutId(task)
         updateTask(`/api/tasks/${task.id}`, newTask.value)
-        .then(_newTask => {
-          Object.assign(tasks.value[tasks.value.findIndex((el) => el.id === task.id)], _newTask)
-        })
+            .then(_newTask => {
+              Object.assign(tasks.value[tasks.value
+                  .findIndex((el) => el.id === task.id)], _newTask)
+            })
         dialogTaskVisible.value = false
         clearTask()
       }
     }
 
     const addChild = (task) => {
+      clearTask()
       headerName.value = "Создание подзадачи"
       dialogChildTaskVisible.value = true
       parentTask.value = task

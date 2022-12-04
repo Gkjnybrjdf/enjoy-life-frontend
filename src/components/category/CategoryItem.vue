@@ -4,7 +4,6 @@
       <div>
         <div class="category-item-name">
           {{ category.name }}
-          {{ category.id }}
         </div>
       </div>
 

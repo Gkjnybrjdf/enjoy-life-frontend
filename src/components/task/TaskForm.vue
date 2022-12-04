@@ -13,13 +13,31 @@
       Название обязательно для заполнения
     </div>
 
+    <app-label>Категории:</app-label>
+    <el-select
+        v-model="categoryValue"
+        multiple
+        popper-class="el-select__dropdown"
+        placeholder="Выберите категорию"
+        style="width: 100%; margin: 0 0 5px 0;"
+        @change="selectChange"
+        @remove-tag="removeTag"
+    >
+      <el-option
+          v-for="category in categoryOptions"
+          :key="category.id"
+          :label="category.name"
+          :value="category.id"
+      />
+    </el-select>
+
     <dropdown
-        :default-content="defaultPriority"
+        :placeholder="defaultPriority"
         :options-content="priorityOptions"
         label="Приоритет"
         v-model="v$.task.priority.$model"
         :error="v$.task.priority.$error"
-        @blur="test"
+        @blur="priorityFieldValidate"
     >
     </dropdown>
     <div
@@ -58,7 +76,8 @@ import {computed, ref} from "vue";
 import Dropdown from "@/components/UI/Dropdown";
 import AppCheckbox from "@/components/UI/AppCheckbox";
 import {required} from "@vuelidate/validators";
-import {useVuelidate} from '@vuelidate/core'
+import {useVuelidate} from '@vuelidate/core';
+import {getCategory} from "@/hooks/useCategoryApi";
 
 export default {
   components: {AppCheckbox, Dropdown, AppLabel, AppButton},
@@ -82,6 +101,35 @@ export default {
             .value
             .findIndex((el) => el.value === props.task.priority)]
             .name
+    const categoryValue = ref([])
+    const categoryOptions = ref([])
+
+    const getCategoryValue = () => {
+      props.task.categories.forEach((el) => {
+        categoryValue.value.push(el.id)
+      })
+    }
+    getCategoryValue()
+
+    getCategory("/api/categories/list")
+        .then(_categories => {
+          categoryOptions.value = _categories
+          categoryOptions.value.forEach(option => option.text = option.name)
+        })
+
+    const selectChange = (selectedCategories) => {
+      selectedCategories.forEach((value) => {
+        if (props.task.categories.find(el => el.id === value) === undefined) {
+          props.task.categories
+              .push(categoryOptions.value.find(el => el.id === value))
+        }
+      })
+    }
+
+    const removeTag = (removedCategoryId) => {
+      props.task.categories.splice(props.task.categories
+          .findIndex(el => el.id === removedCategoryId), 1)
+    }
 
     const rules = computed(() => ({
       task: {
@@ -96,7 +144,7 @@ export default {
 
     const v$ = useVuelidate(rules, {task: props.task})
 
-    const test = () => {
+    const priorityFieldValidate = () => {
       v$.value.task.priority.$touch()
     }
 
@@ -105,7 +153,12 @@ export default {
       defaultPriority,
       btnName,
       v$,
-      test
+      categoryValue,
+      categoryOptions,
+      priorityFieldValidate,
+      selectChange,
+      removeTag,
+      getCategoryValue
     }
   }
 }

@@ -68,6 +68,7 @@ export default {
     }
 
     const showAddDialog = () => {
+      clearCategory()
       headerName.value = "Создание категории"
       dialogVisible.value = true
     }
