@@ -43,11 +43,47 @@
       />
     </app-dialog>
 
+    <div class="upload">
+      <el-upload
+          ref="upload"
+          style="margin-left: auto"
+          action="http://localhost:8080/api/tasks/upload"
+          :on-error="errorUpload"
+          :on-success="successUpload"
+          :limit="1"
+          :auto-upload="false"
+      >
+        <template #trigger>
+          <app-button>
+            Выбрать файл
+          </app-button>
+        </template>
+        <app-button
+            style="margin-left: 5px;
+                   background: mediumslateblue;
+                   color: white;"
+            @click="submitUpload"
+        >
+          Загрузить задачи
+        </app-button>
+        <template #tip>
+          <div class="el-upload__tip text-red">
+            допустимый формат файла: json
+          </div>
+        </template>
+      </el-upload>
+    </div>
   </div>
 </template>
 
 <script>
-import {deleteTask, getFilteredTask, updateTask, saveChildTask, saveTask} from "@/hooks/useTaskApi";
+import {
+  deleteTask,
+  getFilteredTask,
+  updateTask,
+  saveChildTask,
+  saveTask
+} from "@/hooks/useTaskApi";
 import TaskList from "@/components/task/TaskList";
 import {ref} from "vue";
 import MyInput from "@/components/UI/AppInput";
@@ -55,9 +91,11 @@ import TaskForm from "@/components/task/TaskForm";
 import MyDialog from "@/components/UI/AppDialog";
 import {getTaskWithoutId} from "@/hooks/getTaskWithoutId";
 import Prompt from "@/components/UI/Prompt";
+import AppInput from "@/components/UI/AppInput";
+import AppButton from "@/components/UI/AppButton";
 
 export default {
-  components: {Prompt, MyDialog, TaskForm, MyInput, TaskList},
+  components: {AppButton, AppInput, Prompt, MyDialog, TaskForm, MyInput, TaskList},
 
   setup(props) {
     const clearTask = () => {
@@ -84,6 +122,22 @@ export default {
     const tasks = ref([])
     const task = ref({})
     const headerName = ref("")
+    const upload = ref()
+
+    const errorUpload = (error) => {
+      alert("Ошибка при обработке файла")
+    }
+
+    const submitUpload = () => {
+      upload.value.submit()
+    }
+
+    const successUpload = () => {
+      getFilteredTask('/api/tasks/filter', filter.value)
+          .then(_tasks => {
+            tasks.value = _tasks
+          })
+    }
 
     const showDialog = () => {
       clearTask()
@@ -174,6 +228,7 @@ export default {
       parentTask,
       filter,
       headerName,
+      upload,
       showDialog,
       archiveTask,
       removeTask,
@@ -183,7 +238,10 @@ export default {
       fetchChildren,
       closeChildren,
       clearTask,
-      editTask
+      editTask,
+      submitUpload,
+      errorUpload,
+      successUpload
     }
   }
 }
@@ -199,5 +257,10 @@ export default {
 
 .btns {
   margin-left: auto;
+}
+
+.upload {
+  margin: 20px;
+  display: flex;
 }
 </style>
