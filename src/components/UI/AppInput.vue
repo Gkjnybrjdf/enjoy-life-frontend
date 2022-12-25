@@ -1,6 +1,6 @@
 <template>
   <label class="app-label">
-    {{label}}:
+    {{ label }}:
 
     <input
         class="app-input"
@@ -21,7 +21,7 @@ export default {
       type: String
     },
     error: {
-      type:Boolean,
+      type: Boolean,
       default: false,
       required: false
     }
@@ -41,10 +41,11 @@ export default {
 
 <style scoped>
 .app-input {
-  width: 90%;
+  width: 100%;
   border-radius: 5px;
   border: 1px solid darkgrey;
-  padding: 10px 15px;
+  padding: 10px 0 10px 0;
+  text-indent: 10px;
   margin: 0 0 5px 0;
   display: block;
   font-size: 12px;

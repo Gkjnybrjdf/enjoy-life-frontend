@@ -36,9 +36,9 @@
 import Prompt from "@/components/UI/Prompt";
 import CategoryList from "@/components/category/CategoryList";
 import {ref} from "vue";
-import {deleteCategory, getCategory, saveCategory, updateCategory} from "@/hooks/useCategoryApi";
 import AppDialog from "@/components/UI/AppDialog";
 import CategoryForm from "@/components/category/CategoryForm";
+import useAxios from "@/hooks/useAxios";
 
 export default {
   components: {CategoryForm, AppDialog, CategoryList, Prompt},
@@ -57,13 +57,13 @@ export default {
     const category = ref({})
     clearCategory()
 
-    getCategory("/api/categories/list")
+    useAxios.get("/api/categories/list")
         .then(_categories => {
-          categories.value = _categories
+          categories.value = _categories.content
         })
 
     const removeCategory = (category) => {
-      deleteCategory(`/api/categories/${category.id}`)
+      useAxios.delete(`/api/categories/${category.id}`)
       categories.value.splice(categories.value.indexOf(category), 1)
     }
 
@@ -81,14 +81,14 @@ export default {
 
     const submitCategory = (newCategory) => {
       if (newCategory.id === undefined) {
-        saveCategory("/api/categories", newCategory)
+        useAxios.post("/api/categories", newCategory)
             .then(_category => {
               categories.value.push(_category)
               dialogVisible.value = false
               clearCategory()
             })
       } else {
-        updateCategory(`/api/categories/${newCategory.id}`, newCategory)
+        useAxios.put(`/api/categories/${newCategory.id}`, newCategory)
             .then(_category => {
               categories.value[categories.value
                   .findIndex((el) => el.id === newCategory.id)] = _category

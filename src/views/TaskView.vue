@@ -11,7 +11,6 @@
         </prompt>
       </div>
     </div>
-
     <task-list
         :tasks="tasks"
         @archive="archiveTask"
@@ -48,6 +47,7 @@
           ref="upload"
           style="margin-left: auto"
           action="http://localhost:8080/api/tasks/upload"
+          :with-credentials="true"
           :on-error="errorUpload"
           :on-success="successUpload"
           :limit="1"
@@ -77,13 +77,6 @@
 </template>
 
 <script>
-import {
-  deleteTask,
-  getFilteredTask,
-  updateTask,
-  saveChildTask,
-  saveTask
-} from "@/hooks/useTaskApi";
 import TaskList from "@/components/task/TaskList";
 import {ref} from "vue";
 import MyInput from "@/components/UI/AppInput";
@@ -93,6 +86,7 @@ import {getTaskWithoutId} from "@/hooks/getTaskWithoutId";
 import Prompt from "@/components/UI/Prompt";
 import AppInput from "@/components/UI/AppInput";
 import AppButton from "@/components/UI/AppButton";
+import useAxios from "@/hooks/useAxios";
 
 export default {
   components: {AppButton, AppInput, Prompt, MyDialog, TaskForm, MyInput, TaskList},
@@ -133,7 +127,7 @@ export default {
     }
 
     const successUpload = () => {
-      getFilteredTask('/api/tasks/filter', filter.value)
+      useAxios.post('/api/tasks/filter', filter.value)
           .then(_tasks => {
             tasks.value = _tasks
           })
@@ -145,7 +139,7 @@ export default {
       dialogTaskVisible.value = true
     }
 
-    getFilteredTask('/api/tasks/filter', filter.value)
+    useAxios.post('/api/tasks/filter', filter.value)
         .then(_tasks => {
           tasks.value = _tasks
         })
@@ -154,13 +148,19 @@ export default {
       const newTask = getTaskWithoutId(task)
       newTask.value.active = false
 
-      updateTask(`/api/tasks/${task.id}`, newTask.value)
+      useAxios.put(`/api/tasks/${task.id}`, newTask.value)
       tasks.value.splice(tasks.value.indexOf(task), 1)
     }
 
     const removeTask = (task) => {
-      deleteTask(`/api/tasks/${task.id}`)
-      tasks.value.splice(tasks.value.indexOf(task), 1)
+      useAxios.delete(`/api/tasks/${task.id}`)
+      if (task.parentTaskId === null) {
+        tasks.value.splice(tasks.value.indexOf(task), 1)
+      } else {
+        let children = tasks.value[tasks.value
+            .findIndex((el) => el.id === task.parentTaskId)].children
+        children.splice(children.indexOf(task), 1)
+      }
     }
 
     const editTask = (newTask) => {
@@ -171,7 +171,7 @@ export default {
 
     const createTask = (task) => {
       if (task.id === undefined) {
-        saveTask('/api/tasks', task)
+        useAxios.post('/api/tasks', task)
             .then(_task => {
               task = _task
               tasks.value.push(task)
@@ -181,10 +181,19 @@ export default {
             })
       } else {
         const newTask = getTaskWithoutId(task)
-        updateTask(`/api/tasks/${task.id}`, newTask.value)
+
+        useAxios.put(`/api/tasks/${task.id}`, newTask.value)
             .then(_newTask => {
-              Object.assign(tasks.value[tasks.value
-                  .findIndex((el) => el.id === task.id)], _newTask)
+              if (task.parentTaskId === null) {
+                Object.assign(tasks.value[tasks.value
+                    .findIndex((el) => el.id === task.id)], _newTask)
+              } else {
+                let children = tasks.value[tasks.value
+                    .findIndex((el) => el.id === task.parentTaskId)].children
+
+                Object.assign(children[children
+                    .findIndex((el) => el.id === task.id)], _newTask)
+              }
             })
         dialogTaskVisible.value = false
         clearTask()
@@ -199,7 +208,7 @@ export default {
     }
 
     const createChild = (task) => {
-      saveChildTask(`/api/tasks/child/${parentTask.value.id}`, task)
+      useAxios.post(`/api/tasks/child/${parentTask.value.id}`, task)
           .then(_childTask => {
             fetchChildren(parentTask.value)
           })
@@ -209,7 +218,7 @@ export default {
 
     const fetchChildren = (task) => {
       filter.value.parentTaskId = task.id
-      getFilteredTask('/api/tasks/filter', filter.value)
+      useAxios.post('/api/tasks/filter', filter.value)
           .then(_tasks => {
             task.children = _tasks
             task.showChildren = true

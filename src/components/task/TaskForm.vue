@@ -77,7 +77,7 @@ import Dropdown from "@/components/UI/Dropdown";
 import AppCheckbox from "@/components/UI/AppCheckbox";
 import {required} from "@vuelidate/validators";
 import {useVuelidate} from '@vuelidate/core';
-import {getCategory} from "@/hooks/useCategoryApi";
+import useAxios from "@/hooks/useAxios";
 
 export default {
   components: {AppCheckbox, Dropdown, AppLabel, AppButton},
@@ -111,7 +111,7 @@ export default {
     }
     getCategoryValue()
 
-    getCategory("/api/categories/list")
+    useAxios.get("/api/categories/list")
         .then(_categories => {
           categoryOptions.value = _categories
           categoryOptions.value.forEach(option => option.text = option.name)

@@ -17,8 +17,8 @@ export default {
 .select-button {
   width: 21px;
   height: 21px;
-  border-color: red;
   position: relative;
+  cursor: pointer;
 }
 
 .select-button-checked {
