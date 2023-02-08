@@ -106,7 +106,7 @@ export default {
     const v$ = useVuelidate(rules, {user})
 
     const register = () => {
-      useAxios._post("/api/users/registration", user.value)
+      useAxios._post("/api/profile/registration", user.value)
           .then(() => {
             router.push('/successful_registration')
           })

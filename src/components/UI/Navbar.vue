@@ -17,7 +17,7 @@
           style="color: white; margin: 2px"
           @click="$router.push('/task')"
       >
-        Сегодня
+        Задачи
       </app-button>
 
       <app-button
